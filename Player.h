@@ -1,3 +1,4 @@
+#pragma once
 #include "Framework/DrawingWindow.h"
 #include "Framework/Visual2D.h"
 #include "Framework/Transform2D.h"
@@ -21,8 +22,9 @@ private:
 	float speed;
 	bool weaponOn;
 	float epsilon;
+
 public:
-	Player(float x, float y, Color color);
+	Player(float x, float y);
 	~Player();
 	void addPlayer(Visual2D *playGround);
 	void rotatePlayer(float u);

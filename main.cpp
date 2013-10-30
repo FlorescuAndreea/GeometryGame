@@ -7,8 +7,13 @@
 #include "Framework/Polygon2D.h"
 #include <iostream>
 #include <windows.h>
+
 #include "Player.h"
 
+#include "Object.h"
+#include "Opponent1.h"
+#include "Opponent3.h"
+#include "Opponent4.h"
 
 #define PI 3.14159265358979323846
 
@@ -16,13 +21,13 @@ using namespace std;
 
 Visual2D *playGround;
 Visual2D *headsUpDisplay;
-Rectangle2D *rect;
-Circle2D *cerc;
-Polygon2D *poligon;
-Color *portocaliu = new Color(1, 0.498039, 0.313725);
-Player *player = new Player(100, 100, *portocaliu);	
 
-Text *text;
+Player *player = new Player(100, 100);	
+Opponent1 *o1 = new Opponent1(50, 550);
+Opponent3 *o3 = new Opponent3(1200, 50);
+Opponent4 *o4 = new Opponent4(1200, 500);
+
+
 
 //functia care permite adaugarea de obiecte
 void DrawingWindow::init()
@@ -30,6 +35,9 @@ void DrawingWindow::init()
 	playGround = new Visual2D(0,0,DrawingWindow::width,DrawingWindow::height,0,100,DrawingWindow::width,DrawingWindow::height);  
 	addVisual2D(playGround);
 	player->addPlayer(playGround);
+	o1->addOpponent(playGround);
+	o3->addOpponent(playGround);
+	o4->addOpponent(playGround);
 
 	headsUpDisplay = new Visual2D(0,0,DrawingWindow::width,DrawingWindow::height,0,0,DrawingWindow::width,100);
 	addVisual2D(headsUpDisplay);
@@ -40,14 +48,15 @@ void DrawingWindow::init()
 //functia care permite animatia
 void DrawingWindow::onIdle()
 {
-
+	o1->move();
+	o3->move();
+	o4->move();
 }
 
 //functia care se apeleaza la redimensionarea ferestrei
 void DrawingWindow::onReshape(int width,int height)
 {
-	
-	playGround->poarta(0,0,width,height); 
+	playGround->poarta(0,0,width - 100,height - 100); 
 }
 
 //functia care defineste ce se intampla cand se apasa pe tastatura
