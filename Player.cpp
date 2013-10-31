@@ -2,7 +2,7 @@
 
 Player::Player(float x, float y) {
 
-	this->epsilon = 30;
+	this->epsilon = 10;
 
 	this->weaponOn = false;
 	this->speed = 1;
@@ -27,15 +27,13 @@ Player::Player(float x, float y) {
 	//End Player
 
 	//Add Weapon
-	weapon = new Polygon2D(*color, true);
-	weapon->addPoint(Point2D(this->x + 30, this->y + 15));
-	weapon->addPoint(Point2D(this->x + 90, this->y));
-	weapon->addPoint(Point2D(this->x + 30, this->y - 15));
+	weapon = new Weapon(x, y);
 	//End Weapon
 }
 
 Player::~Player() {
-	
+	delete cerc;
+	delete poligon;
 }
 
 void Player::addPlayer(Visual2D *playGround) {
@@ -45,46 +43,48 @@ void Player::addPlayer(Visual2D *playGround) {
 
 void Player::rotatePlayer(float u) {
 
-	this->u += u;
-
 	Transform2D::loadIdentityMatrix();
 	Transform2D::translateMatrix(-this->x, -this->y);
 	Transform2D::rotateMatrix(u);
 	Transform2D::translateMatrix(this->x, this->y);
 	Transform2D::applyTransform_o(poligon);
-	Transform2D::applyTransform_o(weapon);
+	weapon->rotate(u);
+	this->u += u;
 }
 
 void Player::activateWeapon(Visual2D *playGround) {
 	weaponOn = true;
 	speed = 0.2;
-	DrawingWindow::addObject2D_to_Visual2D(weapon, playGround);
+	weapon->addWeapon(playGround);
 }
 
 void Player::deactivateWeapon(Visual2D *playGround) {
 	weaponOn = false;
 	speed = 1;
-	DrawingWindow::removeObject2D_from_Visual2D(weapon, playGround);
+	weapon->removeWeapon(playGround);
 }
 
 void Player::translatePlayer() {
 	float newX, newY;
-	newX = this->x + radius*cos(u)*speed;
-	newY = this->y + radius*sin(u)*speed;
-
-	if(newX + weaponWidth < DrawingWindow::width && newX - weaponWidth > 0 && //x is in window
-		newY + weaponWidth + 100 - epsilon < DrawingWindow::height && newY - weaponWidth > 0 //y is in window
+	float tx, ty;
+	tx = radius*cos(u)*speed;
+	ty = radius*sin(u)*speed;
+	newX = this->x + tx;
+	newY = this->y + ty;
+	if(newX + weaponWidth < DrawingWindow::width && newX - weaponWidth> 0 && //x is in window
+		newY + weaponWidth < DrawingWindow::height && newY - weaponWidth  - epsilon > 0 //y is in window
 	   ) {
 
 		this->x = newX;
 		this->y = newY;
+		weapon->setCoord(x, y);
 		Transform2D::loadIdentityMatrix();
-		Transform2D::translateMatrix(radius*cos(u)*speed, radius* sin(u)*speed);
+		Transform2D::translateMatrix(tx, ty);
 		Transform2D::applyTransform_o(poligon);
 		Transform2D::applyTransform_o(cerc);
-		Transform2D::applyTransform_o(weapon);
+		weapon->translate(tx, ty);
+		weapon->getTransPoints();
 	}
-	cout << y << "\n";
 }
 
 bool Player::isWeaponOn() {

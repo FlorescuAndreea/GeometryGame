@@ -1,12 +1,12 @@
+#pragma once
 #include "Object.h"
 
-class Opponent3 : Object {
+class Opponent3 : public Object {
 private:
 	float l; // latura triunghiului
 	float u; // unghiul sub care s-a produs rotatia
 	float r; // raza cercului interior
 	float points; // numarul de puncte pe care il castiga jucatorul
-	pair<float, float> dir; //directia in care se misca Oponentul
 	float speed;
 
 	// Componentele vizuale ale Oponentului
@@ -16,8 +16,6 @@ private:
 	Polygon2D *t3;
 	Polygon2D *t4;
 
-	// Alege o noua directie random pentru deplasarea oponentului
-	pair<float, float> chooseDirection();
 	// determina daca noua pozitie a oponentului este in playGround 
 	bool isOutOfBox(float newX, float newY); 
 public:
@@ -25,8 +23,11 @@ public:
 	~Opponent3();
 
 	void addOpponent(Visual2D *playGround);
+	void removeOpponent(Visual2D *playGround);
 	void rotateOpponent(float u);
 	void translateOpponent();
 	void move();
 	float getPoints();
+	pair<Point2D, Point2D> getTransfPoints();
+	void die(Visual2D *playGround);
 };

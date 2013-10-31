@@ -7,7 +7,7 @@ Opponent4::Opponent4(float x, float y) : Object(x, y) {
 	
 	this->scale = 0;
 	this->scaleFactor = 1.3;
-	this->points = 50;
+	this->points = 40;
 	this->clock = 0;
 
 	this->speed = 0.03;
@@ -16,7 +16,7 @@ Opponent4::Opponent4(float x, float y) : Object(x, y) {
 
 	Color *color = new Color(0, 1, 0);
 	
-	romb = new Polygon2D(*color, false);
+	romb = new Polygon2D(*color, true);
 	romb->addPoint(Point2D(x+l/2, y));
 	romb->addPoint(Point2D(x+l, y+l/2));
 	romb->addPoint(Point2D(x+l/2, y+l));
@@ -24,11 +24,15 @@ Opponent4::Opponent4(float x, float y) : Object(x, y) {
 }
 
 Opponent4::~Opponent4() {
-
+	delete romb;
 }
 
 void Opponent4::addOpponent(Visual2D *playGround) {
 	DrawingWindow::addObject2D_to_Visual2D(romb, playGround);
+}
+
+void Opponent4::removeOpponent(Visual2D *playGround) {
+	DrawingWindow::removeObject2D_from_Visual2D(romb, playGround);
 }
 
 float Opponent4::getPoints() {
@@ -90,9 +94,40 @@ void Opponent4::move() {
 		
 		if(clock == 501) {
 			clock = 0;
-			dir.first = rand()%3 - 1;
-			dir.second = rand()%3 - 1;
+			this->chooseDirection();
 		}
 	}
 	clock ++;
+}
+
+pair<Point2D, Point2D> Opponent4::getTransfPoints(){
+	vector<Point2D*> aux; // retine toate punctele din obiectele componente
+	aux = romb->transf_points;
+
+	// pentru dreptunghiul imaginar se folosesc doua puncte:
+	// P1(minX, maxY), P2(maxX, minY)
+	float maxX = 0, maxY = 0, minX = DrawingWindow::width, minY = DrawingWindow::height;
+	for (int i = 0; i < aux.size(); i++) {
+		if (aux[i]->x > maxX) {
+			maxX = aux[i]->x;
+		}
+		
+		if (aux[i]->x < minX) {
+			minX = aux[i]->x;
+		}
+
+		if(aux[i]->y > maxY) {
+			maxY = aux[i]->y;	
+		}
+
+		if(aux[i]->y < minY) {
+			minY = aux[i]->y;
+		}
+	}
+
+	return make_pair(Point2D(minX, maxY), Point2D(maxX, minY));
+}
+
+void Opponent4::die(Visual2D *playGround) {
+	this->removeOpponent(playGround);
 }

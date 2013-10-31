@@ -9,6 +9,8 @@
 #include <iostream>
 #include <windows.h>
 
+#include "Weapon.h"
+
 class Player {
 
 private:
@@ -17,13 +19,13 @@ private:
 	float u;
 	Polygon2D *poligon;
 	Circle2D *cerc;
-	Polygon2D *weapon;
 	float weaponWidth;
 	float speed;
 	bool weaponOn;
 	float epsilon;
 
 public:
+	Weapon *weapon;
 	Player(float x, float y);
 	~Player();
 	void addPlayer(Visual2D *playGround);

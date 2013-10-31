@@ -8,7 +8,7 @@ Opponent1::Opponent1(float x, float y) : Object(x, y) {
 	this->l = 20;
 	this->u = 0;
 	this->points = 10;
-	this->speed = 0.05;
+	this->speed = 0.02;
 
 
 	this->dir.first = 1;
@@ -20,13 +20,21 @@ Opponent1::Opponent1(float x, float y) : Object(x, y) {
 }
 
 Opponent1::~Opponent1() {
-
+	delete r1;
+	delete r2;
+	delete rm;
 }
 
 void Opponent1::addOpponent(Visual2D *playGround) {
 	DrawingWindow::addObject2D_to_Visual2D(r1, playGround);
 	DrawingWindow::addObject2D_to_Visual2D(r2, playGround);
 	DrawingWindow::addObject2D_to_Visual2D(rm, playGround);
+}
+
+void Opponent1::removeOpponent(Visual2D *playGround) {
+	DrawingWindow::removeObject2D_from_Visual2D(r1, playGround);
+	DrawingWindow::removeObject2D_from_Visual2D(r2, playGround);
+	DrawingWindow::removeObject2D_from_Visual2D(rm, playGround);
 }
 
 float Opponent1::getPoints() {
@@ -36,8 +44,7 @@ float Opponent1::getPoints() {
 void Opponent1::move() {
 	
 	if (clock == 100) {
-		dir.first = rand()%3 - 1;
-		dir.second = rand()%3 - 1;
+		chooseDirection();
 		clock = 0;
 	}
 	translateOpponent();
@@ -86,4 +93,38 @@ bool Opponent1::isOutOfBox(float newX, float newY) {
 	return
 		newX + this->l * 2 + epsilon > DrawingWindow::width || newX  - epsilon < 0 || //x is in window
 		newY + this->l/2 + 100 + epsilon > DrawingWindow::height || newY - (this->l/2 + epsilon) < 0; //y is in window
+}
+
+pair<Point2D, Point2D> Opponent1::getTransfPoints() {
+	// r1->transf_points[0] -> extrema stanga a dreptunghiului imaginar
+	// r2->transf_points[2] -> extrema dreapta a dreptunghiului imaginar
+	vector<Point2D*> aux; // retine toate punctele din obiectele componente
+	aux = r1->transf_points;
+	aux.insert(aux.end(), r2->transf_points.begin(), r2->transf_points.end());
+	
+	float maxX = 0, maxY = 0, minX = DrawingWindow::width, minY = DrawingWindow::height;
+	for (int i = 0; i < aux.size(); i++) {
+		if (aux[i]->x > maxX) {
+			maxX = aux[i]->x;
+		}
+		
+		if (aux[i]->x < minX) {
+			minX = aux[i]->x;
+		}
+
+		if(aux[i]->y > maxY) {
+			maxY = aux[i]->y;	
+		}
+
+		if(aux[i]->y < minY) {
+			minY = aux[i]->y;
+		}
+	}
+	// pentru dreptunghiul imaginar se folosesc doua puncte:
+	// P1(minX, maxY), P2(maxX, minY)
+	return make_pair(Point2D(minX, maxY), Point2D(maxX, minY));
+}
+
+void Opponent1::die(Visual2D *playGround) {
+	this->removeOpponent(playGround);
 }
